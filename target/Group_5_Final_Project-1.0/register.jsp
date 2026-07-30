@@ -22,9 +22,11 @@
         <h1>Create your account</h1>
         <p class="subtitle">Register as a User, Trainer, or Shop-Tech.</p>
 
-        <!-- No action/method wired yet — AccountServlet will handle
-             this once the Business layer exists. -->
-        <form>
+        <% if (request.getAttribute("error") != null) { %>
+          <p style="color:red;"><%= request.getAttribute("error") %></p>
+        <% } %>
+
+        <form action="RegisterServlet" method="POST">
           <div class="field">
             <label for="name">Full name</label>
             <input type="text" id="name" name="name" placeholder="Jane Student" required>

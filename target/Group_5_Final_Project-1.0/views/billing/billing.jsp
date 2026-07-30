@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List" %>
+<%@ page import="model.LedgerEntry" %>
 <% request.setAttribute("pageTitle", "Billing"); %>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,15 +16,40 @@
 
       <main class="content">
         <div class="content-header">
-          <p>Credit and debit history, and end-of-month settlement.</p>
+          <p>Credit and debit history. Data below is hard-coded for now (BillingServlet + BillingDao) until the real database is connected.</p>
         </div>
 
-        <!-- TODO: replace with ledger table + settle-debit action once the Billing DAO/DTO exist. -->
-        <div class="empty-state">
-          <div class="icon">&#36;</div>
-          <h3>Billing history coming soon</h3>
-          <p>Your credit/debit ledger and settlement status will appear here once the Business and Data layers are connected.</p>
-        </div>
+        <% if (request.getAttribute("message") != null) { %>
+          <p class="info-banner"><%= request.getAttribute("message") %></p>
+        <% } %>
+
+        <table class="data-table">
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Description</th>
+          </tr>
+          <%
+            List<LedgerEntry> entries = (List<LedgerEntry>) request.getAttribute("entries");
+            for (LedgerEntry e : entries) {
+          %>
+          <tr>
+            <td><%= e.getEntryDate() %></td>
+            <td><%= e.getType() %></td>
+            <td>$<%= String.format("%.2f", e.getAmount()) %></td>
+            <td><%= e.getDescription() %></td>
+          </tr>
+          <% } %>
+          <tr>
+            <td colspan="2"><b>Balance</b></td>
+            <td colspan="2"><b>$<%= String.format("%.2f", (Double) request.getAttribute("balance")) %></b></td>
+          </tr>
+        </table>
+
+        <form action="${pageContext.request.contextPath}/BillingServlet" method="post">
+          <button type="submit" class="btn btn-primary">Settle debits</button>
+        </form>
       </main>
     </div>
   </div>

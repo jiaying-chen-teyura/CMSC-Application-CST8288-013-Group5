@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List" %>
+<%@ page import="model.WorkOrder" %>
 <% request.setAttribute("pageTitle", "Work Orders"); %>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,15 +16,41 @@
 
       <main class="content">
         <div class="content-header">
-          <p>Submit, accept, and track fabrication work orders.</p>
+          <p>Submit, accept, and track fabrication work orders. Data below is hard-coded for now (WorkOrderServlet + WorkOrderDao) until the real database is connected.</p>
         </div>
 
-        <!-- TODO: replace with work order table + accept/check-in/out actions once the WorkOrder DAO/DTO exist. -->
-        <div class="empty-state">
-          <div class="icon">&#128203;</div>
-          <h3>Work orders coming soon</h3>
-          <p>Submitted jobs, their status, and history will appear here once the Business and Data layers are connected.</p>
-        </div>
+        <% if (request.getAttribute("message") != null) { %>
+          <p class="info-banner"><%= request.getAttribute("message") %></p>
+        <% } %>
+
+        <table class="data-table">
+          <tr>
+            <th>#</th>
+            <th>Description</th>
+            <th>Requested by</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+          <%
+            List<WorkOrder> workOrders = (List<WorkOrder>) request.getAttribute("workOrders");
+            for (WorkOrder w : workOrders) {
+          %>
+          <tr>
+            <td><%= w.getId() %></td>
+            <td><%= w.getDescription() %></td>
+            <td><%= w.getRequestedBy() %></td>
+            <td><%= w.getStatus() %></td>
+            <td>
+              <% if ("Pending".equals(w.getStatus())) { %>
+              <form action="${pageContext.request.contextPath}/WorkOrderServlet" method="post">
+                <input type="hidden" name="id" value="<%= w.getId() %>">
+                <button type="submit" class="btn btn-primary">Accept</button>
+              </form>
+              <% } %>
+            </td>
+          </tr>
+          <% } %>
+        </table>
       </main>
     </div>
   </div>

@@ -394,6 +394,50 @@ button {
 }
 
 /* ------------------------------------------------------------
+   Data tables (equipment, consumables, training, etc.)
+   ------------------------------------------------------------ */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-6);
+  font-size: var(--text-sm);
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table th {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.data-table form {
+  margin: 0;
+}
+
+.info-banner {
+  background: var(--color-surface-alt, rgba(242, 169, 59, 0.12));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+  font-size: var(--text-sm);
+}
+
+/* Style for placeholder text */
+.field input::placeholder,
+.field select::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1; /* Firefox applies a lower opacity by default, this normalizes it */
+}
+
+
+/* ------------------------------------------------------------
    Auth pages (login / register) — split screen
    ------------------------------------------------------------ */
 

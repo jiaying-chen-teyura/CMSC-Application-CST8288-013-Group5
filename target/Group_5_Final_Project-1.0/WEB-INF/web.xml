@@ -4,9 +4,65 @@
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>controller.LoginServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>RegisterServlet</servlet-name>
+        <servlet-class>controller.RegisterServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>BillingServlet</servlet-name>
+        <servlet-class>controller.BillingServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>BookEquipmentServlet</servlet-name>
+        <servlet-class>controller.BookEquipmentServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ConsumableServlet</servlet-name>
+        <servlet-class>controller.ConsumableServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EquipmentManagementServlet</servlet-name>
+        <servlet-class>controller.EquipmentManagementServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MaintenanceServlet</servlet-name>
+        <servlet-class>controller.MaintenanceServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TrainingServlet</servlet-name>
+        <servlet-class>controller.TrainingServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/LoginServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RegisterServlet</servlet-name>
+        <url-pattern>/RegisterServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BillingServlet</servlet-name>
+        <url-pattern>/BillingServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BookEquipmentServlet</servlet-name>
+        <url-pattern>/BookEquipmentServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ConsumableServlet</servlet-name>
+        <url-pattern>/ConsumableServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EquipmentManagementServlet</servlet-name>
+        <url-pattern>/EquipmentManagementServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MaintenanceServlet</servlet-name>
+        <url-pattern>/MaintenanceServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TrainingServlet</servlet-name>
+        <url-pattern>/TrainingServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

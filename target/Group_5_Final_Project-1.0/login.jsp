@@ -3,8 +3,6 @@
 <html lang="en">
 <head>
 <%@ include file="/views/common/head.jsp" %>
-
-
 </head>
 <body>
   <div class="auth-shell">
@@ -24,7 +22,12 @@
         <h1>Welcome back</h1>
         <p class="subtitle">Log in to book equipment, track credits, and more.</p>
 
-        
+        <% if (request.getAttribute("error") != null) { %>
+          <p style="color:red;"><%= request.getAttribute("error") %></p>
+        <% } else if ("true".equals(request.getParameter("registered"))) { %>
+          <p style="color:green;">Account created - log in below.</p>
+        <% } %>
+
         <form action="LoginServlet" method="POST">
           <div class="field">
             <label for="email">Email</label>

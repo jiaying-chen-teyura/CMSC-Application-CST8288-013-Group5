@@ -18,7 +18,7 @@
 
 /* ---- Color: text ---- */
 --color-text: #1E3A3A;        /* primary text (deep teal) */
---color-text-muted: #6B7A7A;  /* muted text (gray-teal) */
+--color-text-muted: #95a0a0;  /* muted text (gray-teal) */
 --color-text-inverse: #F9F7F4; /* inverse text (light cream) */
 
 /* ---- Color: accents ---- */
