@@ -393,6 +393,14 @@ button {
   color: var(--color-text-muted);
 }
 
+/* Style for placeholder text */
+.field input::placeholder,
+.field select::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1; /* Firefox applies a lower opacity by default, this normalizes it */
+}
+
+
 /* ------------------------------------------------------------
    Auth pages (login / register) — split screen
    ------------------------------------------------------------ */
@@ -554,3 +562,121 @@ button {
     transition: none !important;
   }
 }
+
+/* ============================================================
+   Additions for the wired-up app (Claude): tables, badges,
+   alerts, and simple form layout helpers. Reuses the existing
+   design tokens from variables.css - no colors/fonts invented.
+   ============================================================ */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--color-text);
+  margin: 0 0 var(--space-4) 0;
+}
+
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+table.data-table th {
+  text-align: left;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-2) var(--space-3);
+}
+
+table.data-table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  vertical-align: top;
+}
+
+table.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.badge-available, .badge-completed, .badge-healthy, .badge-active, .badge-sufficient {
+  background: rgba(67, 195, 186, 0.16);
+  color: var(--color-accent-dark);
+}
+
+.badge-in_use, .badge-scheduled, .badge-booked, .badge-in_progress, .badge-alerted, .badge-submitted {
+  background: rgba(139, 202, 197, 0.25);
+  color: var(--color-text);
+}
+
+.badge-maintenance, .badge-maintenance_required, .badge-restock_required, .badge-urgent, .badge-rush, .badge-cancelled, .badge-unavailable, .badge-broken {
+  background: rgba(214, 83, 74, 0.14);
+  color: var(--color-danger);
+}
+
+.alert {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.alert-error {
+  background: rgba(214, 83, 74, 0.1);
+  color: var(--color-danger);
+  border: 1px solid rgba(214, 83, 74, 0.3);
+}
+
+.alert-info {
+  background: rgba(67, 195, 186, 0.1);
+  color: var(--color-accent-dark);
+  border: 1px solid rgba(67, 195, 186, 0.3);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  align-items: end;
+}
+
+.form-grid .field, .form-row-split .field {
+  margin-bottom: 0;
+}
+
+.inline-form {
+  display: flex;
+  gap: var(--space-3);
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.btn-small {
+  padding: 4px 12px;
+  font-size: var(--text-xs);
+}
+
+.text-muted { color: var(--color-text-muted); }
+.mt-4 { margin-top: var(--space-4); }
+.mb-0 { margin-bottom: 0; }

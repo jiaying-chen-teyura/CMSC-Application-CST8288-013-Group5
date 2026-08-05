@@ -24,9 +24,14 @@ import jakarta.servlet.http.HttpSession;
 //@WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
 
-    // TEMPORARY hard-coded credentials, remove once UserDao exists.
-    private static final String TEST_EMAIL = "jane@abc.com";
-    private static final String TEST_PASSWORD = "123";
+    
+    
+    
+    // TEMPORARY hard-coded accounts, remove once UserDao exists.
+    // One per role so the team can test what each role sees.
+    //   User:      jane@abc.com   / 123
+    //   Shop-Tech: tech@abc.com   / 123
+    //   Trainer:   trainer@abc.com/ 123
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -42,9 +47,24 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        if (TEST_EMAIL.equals(email) && TEST_PASSWORD.equals(password)) {
+        String userName = null;
+        String userType = null;
+
+        if ("jane@abc.com".equals(email) && "123".equals(password)) {
+            userName = "Jane Student";
+            userType = "USER";
+        } else if ("tech@abc.com".equals(email) && "123".equals(password)) {
+            userName = "Sam Shop-Tech";
+            userType = "SHOP_TECH";
+        } else if ("trainer@abc.com".equals(email) && "123".equals(password)) {
+            userName = "Alex Trainer";
+            userType = "TRAINER";
+        }
+
+        if (userName != null) {
             HttpSession session = request.getSession();
-            session.setAttribute("userName", "Jane Student");
+            session.setAttribute("userName", userName);
+            session.setAttribute("userType", userType);
 
             response.sendRedirect(request.getContextPath() + "/views/dashboard/dashboard.jsp");
         } else {

@@ -1,10 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<%@ include file="/views/common/head.jsp" %>
-
-
+<%@ include file="/WEB-INF/views/common/head.jsp" %>
 </head>
 <body>
   <div class="auth-shell">
@@ -24,8 +23,18 @@
         <h1>Welcome back</h1>
         <p class="subtitle">Log in to book equipment, track credits, and more.</p>
 
-        
-        <form action="LoginServlet" method="POST">
+        <c:if test="${not empty errorMessage}">
+          <div class="alert alert-error">${errorMessage}</div>
+        </c:if>
+        <c:if test="${not empty param.error}">
+          <div class="alert alert-error">${param.error}</div>
+        </c:if>
+        <c:if test="${param.registered == 'true'}">
+          <div class="alert alert-info">Account created &mdash; log in below.</div>
+        </c:if>
+
+        <form action="${pageContext.request.contextPath}/controller" method="POST">
+          <input type="hidden" name="action" value="login">
           <div class="field">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" placeholder="you@example.com" required>
@@ -40,6 +49,12 @@
         </form>
 
         <p class="auth-switch">Don't have an account? <a href="register.jsp">Register</a></p>
+        <p class="auth-switch"><a href="${pageContext.request.contextPath}/external-request.jsp">Requesting a job as an external client?</a></p>
+
+        <div class="hint mt-4">
+          Demo accounts (seed data): admin@cmsc.local / admin123 &middot; jane@abc.com / user123 &middot;
+          tara@abc.com / trainer123 &middot; theo@abc.com / tech123
+        </div>
       </div>
     </div>
   </div>

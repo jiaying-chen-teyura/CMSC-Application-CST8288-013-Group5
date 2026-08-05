@@ -1,8 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<%@ include file="/views/common/head.jsp" %>
+<%@ include file="/WEB-INF/views/common/head.jsp" %>
 </head>
 <body>
   <div class="auth-shell">
@@ -22,9 +23,14 @@
         <h1>Create your account</h1>
         <p class="subtitle">Register as a User, Trainer, or Shop-Tech.</p>
 
-        <!-- No action/method wired yet — AccountServlet will handle
-             this once the Business layer exists. -->
-        <form>
+        <c:if test="${not empty errorMessage}">
+          <div class="alert alert-error">${errorMessage}</div>
+        </c:if>
+
+        <form action="${pageContext.request.contextPath}/controller" method="POST"
+              onsubmit="return document.getElementById('password').value === document.getElementById('confirmPassword').value
+                        || (alert('Passwords do not match'), false);">
+          <input type="hidden" name="action" value="register">
           <div class="field">
             <label for="name">Full name</label>
             <input type="text" id="name" name="name" placeholder="Jane Student" required>
@@ -38,11 +44,11 @@
           <div class="form-row-split">
             <div class="field">
               <label for="password">Password</label>
-              <input type="password" id="password" name="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required>
+              <input type="password" id="password" name="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required minlength="6">
             </div>
             <div class="field">
               <label for="confirmPassword">Confirm password</label>
-              <input type="password" id="confirmPassword" name="confirmPassword" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required>
+              <input type="password" id="confirmPassword" name="confirmPassword" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required minlength="6">
             </div>
           </div>
 

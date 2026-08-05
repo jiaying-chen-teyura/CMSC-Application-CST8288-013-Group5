@@ -7,9 +7,4 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/variables.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css">
 
-<!--<link rel="stylesheet"  href="<%= request.getContextPath() %>/resources/css/variables.css">
-<link rel="stylesheet"  href="<%= request.getContextPath() %>/resources/css/main.css">-->
-
-
-
-<title>CMSC</title>
+<title>${empty pageTitle ? "CMSC" : pageTitle} &middot; CMSC</title>
