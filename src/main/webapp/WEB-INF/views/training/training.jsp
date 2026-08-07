@@ -18,7 +18,8 @@
 
         <div class="card">
           <h2 class="section-title">Schedule a Training Session</h2>
-          <form class="form-grid" action="${pageContext.request.contextPath}/controller" method="POST">
+          <p class="hint">Pick a date, then an hour, then a minute — minutes are always :00, :15, :30, or :45.</p>
+          <form class="form-grid" id="trainingForm" action="${pageContext.request.contextPath}/controller" method="POST">
             <input type="hidden" name="action" value="scheduleTraining">
             <div class="field"><label>Title</label><input type="text" name="title" required></div>
             <div class="field"><label>Equipment Category</label>
@@ -28,8 +29,12 @@
                 <option value="CNC">CNC</option>
               </select>
             </div>
-            <div class="field"><label>Start</label><input type="datetime-local" name="scheduledStart" required></div>
-            <div class="field"><label>End</label><input type="datetime-local" name="scheduledEnd" required></div>
+            <div class="field"><label>Start</label>
+              <div class="qh-picker" id="scheduledStartField" data-name="scheduledStart"></div>
+            </div>
+            <div class="field"><label>End</label>
+              <div class="qh-picker" id="scheduledEndField" data-name="scheduledEnd"></div>
+            </div>
             <div class="field"><label>Location</label><input type="text" name="location"></div>
             <div class="field"><label>Capacity</label><input type="number" min="1" name="capacity" value="8" required></div>
             <div class="field"><button type="submit" class="btn btn-primary">Schedule</button></div>
@@ -70,5 +75,8 @@
       </main>
     </div>
   </div>
+  <script src="${pageContext.request.contextPath}/assets/js/quarter-hour-field.js"></script>
+  <script src="${pageContext.request.contextPath}/assets/js/time-range.js"></script>
+  <script>initTimeRange("scheduledStartField", "scheduledEndField", "trainingForm", 15);</script>
 </body>
 </html>

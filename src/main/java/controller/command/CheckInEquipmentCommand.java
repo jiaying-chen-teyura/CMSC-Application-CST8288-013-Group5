@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import businesslayer.UsageSessionBusinessLogic;
 import businesslayer.ValidationException;
 import controller.SessionUtil;
-import controller.command.Command;
 
 /** FR-03: Check In Equipment. */
 public class CheckInEquipmentCommand implements Command {
@@ -22,6 +21,6 @@ public class CheckInEquipmentCommand implements Command {
         } catch (ValidationException e) {
             request.setAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/controller?action=viewActiveSessions";
+        return "redirect:/controller?action=viewEquipmentAvailability";
     }
 }

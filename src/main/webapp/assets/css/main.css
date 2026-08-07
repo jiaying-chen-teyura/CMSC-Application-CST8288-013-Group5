@@ -368,8 +368,9 @@ button {
   margin-bottom: var(--space-2);
 }
 
-.field input,
-.field select {
+.field input:not([type="checkbox"]):not([type="radio"]),
+.field select,
+.field textarea {
   width: 100%;
   padding: var(--space-3);
   border-radius: var(--radius-sm);
@@ -378,13 +379,60 @@ button {
   font-family: var(--font-body);
   background: var(--color-surface);
   color: var(--color-text);
+  box-sizing: border-box;
+}
+
+.field textarea {
+  resize: vertical;
 }
 
 .field input:focus,
-.field select:focus {
+.field select:focus,
+.field textarea:focus {
   outline: none;
   border-color: var(--color-accent-dark);
   box-shadow: 0 0 0 3px rgba(242, 169, 59, 0.18);
+}
+
+/* Quarter-hour picker (Book Equipment / Schedule Maintenance / Schedule
+   Training): a date input plus Hour/Minute selects, where Minute only
+   ever offers :00/:15/:30/:45. See assets/js/quarter-hour-field.js. */
+.qh-picker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.qh-picker .qh-date {
+  flex: 1 1 140px;
+}
+
+.qh-picker .qh-hour,
+.qh-picker .qh-minute {
+  width: 72px !important;
+  flex: 0 0 auto;
+}
+
+.field-checkbox {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: var(--space-3);
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  margin-bottom: 0 !important;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  flex: none;
 }
 
 .field .hint {
@@ -609,6 +657,20 @@ table.data-table td {
 
 table.data-table tr:last-child td {
   border-bottom: none;
+}
+
+/* Small inline-editable inputs/selects inside data-table cells (e.g. Manage Consumables). */
+table.data-table .table-input,
+table.data-table select {
+  width: 100%;
+  max-width: 120px;
+  padding: 4px 6px;
+  font-size: var(--text-sm);
+  font-family: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .badge {

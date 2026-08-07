@@ -24,11 +24,14 @@ public class SubmitWorkOrderCommand implements Command {
         try {
             if (external) {
                 ExternalJobRequestForm form = new ExternalJobRequestForm(
-                        request.getParameter("contactName"),
+                        request.getParameter("firstName"),
+                        request.getParameter("lastName"),
+                        request.getParameter("organization"),
                         request.getParameter("contactEmail"),
                         request.getParameter("contactPhone"),
                         request.getParameter("jobDetails"),
-                        "true".equals(request.getParameter("isUrgent")));
+                        "true".equals(request.getParameter("isUrgent")),
+                        parseOrZero(request.getParameter("labourRate")));
                 workOrderBL.submitExternalWorkOrder(form);
                 request.setAttribute("infoMessage", "Your job request was submitted. Our team will reach out with a quote.");
                 return "forward:/external-request.jsp";

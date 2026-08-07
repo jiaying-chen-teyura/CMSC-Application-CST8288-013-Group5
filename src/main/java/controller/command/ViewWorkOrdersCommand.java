@@ -6,7 +6,7 @@ import businesslayer.WorkOrderBusinessLogic;
 import controller.SessionUtil;
 import transferobjects.UserDTO;
 
-/** Lists work orders relevant to the current actor (open queue for Shop-Techs, own jobs for members). */
+/** Lists work orders for the Shop-Tech open queue. Restricted to Shop-Tech - Users and Trainers don't have a Work Orders section. */
 public class ViewWorkOrdersCommand implements Command {
 
     private final WorkOrderBusinessLogic workOrderBL = new WorkOrderBusinessLogic();
@@ -14,12 +14,11 @@ public class ViewWorkOrdersCommand implements Command {
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
         UserDTO user = SessionUtil.getCurrentUser(request);
-        request.setAttribute("openWorkOrders", workOrderBL.getOpenWorkOrders());
-        if (user.isShopTech() || user.isAdmin()) {
-            request.setAttribute("myWorkOrders", workOrderBL.getWorkOrdersForShopTech(user.getUserId()));
-        } else {
-            request.setAttribute("myWorkOrders", workOrderBL.getWorkOrdersForMember(user.getUserId()));
+        if (!user.isShopTech()) {
+            return "redirect:/controller?action=dashboard";
         }
+        request.setAttribute("openWorkOrders", workOrderBL.getOpenWorkOrders());
+        request.setAttribute("myWorkOrders", workOrderBL.getWorkOrdersForShopTech(user.getUserId()));
         return "forward:/WEB-INF/views/workorder/workorders.jsp";
     }
 }

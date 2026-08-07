@@ -8,7 +8,7 @@ import controller.SessionUtil;
 import transferobjects.EquipmentDTO;
 import transferobjects.UserDTO;
 
-/** FR-02: Register Equipment (Shop-Tech / Admin). */
+/** FR-02: Register Equipment (Shop-Tech only - Shop-Tech is the administrative role). */
 public class RegisterEquipmentCommand implements Command {
 
     private final EquipmentBusinessLogic equipmentBL = new EquipmentBusinessLogic();
@@ -16,8 +16,8 @@ public class RegisterEquipmentCommand implements Command {
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
         UserDTO user = SessionUtil.getCurrentUser(request);
-        if (!user.isShopTech() && !user.isAdmin()) {
-            request.setAttribute("errorMessage", "Only a Shop-Tech or Admin can register equipment.");
+        if (!user.isShopTech()) {
+            request.setAttribute("errorMessage", "Only a Shop-Tech can register equipment.");
             return "forward:/WEB-INF/views/equipment/equipment.jsp";
         }
         try {

@@ -15,7 +15,7 @@
         Earn your <span class="accent">access</span>.
       </div>
 
-      <div class="footnote">Campus Maker Space Co-op &middot; CST8288</div>
+      <div class="footnote">Campus Maker Space Co-op</div>
     </div>
 
     <div class="auth-form-side">
@@ -50,11 +50,6 @@
 
         <p class="auth-switch">Don't have an account? <a href="register.jsp">Register</a></p>
         <p class="auth-switch"><a href="${pageContext.request.contextPath}/external-request.jsp">Requesting a job as an external client?</a></p>
-
-        <div class="hint mt-4">
-          Demo accounts (seed data): admin@cmsc.local / admin123 &middot; jane@abc.com / user123 &middot;
-          tara@abc.com / trainer123 &middot; theo@abc.com / tech123
-        </div>
       </div>
     </div>
   </div>

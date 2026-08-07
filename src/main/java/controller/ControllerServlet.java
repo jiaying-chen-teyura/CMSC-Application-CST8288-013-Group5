@@ -54,7 +54,7 @@ public class ControllerServlet extends HttpServlet {
         // submitWorkOrder is public for the External Client actor, but member submissions
         // (isExternal != "true") still require a session - enforced inside the Command itself.
         boolean external = "true".equals(request.getParameter("isExternal"));
-        boolean requiresLogin = !(PUBLIC_ACTIONS.contains(action) && (external || !"submitWorkOrder".equals(action)));
+        boolean requiresLogin = !(action != null && PUBLIC_ACTIONS.contains(action) && (external || !"submitWorkOrder".equals(action)));
 
         if (requiresLogin && !SessionUtil.isLoggedIn(request) && !"login".equals(action) && !"register".equals(action)) {
             response.sendRedirect(request.getContextPath() + "/login.jsp?error=Please+log+in+first");

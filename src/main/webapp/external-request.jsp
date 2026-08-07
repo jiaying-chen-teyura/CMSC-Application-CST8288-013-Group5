@@ -10,7 +10,7 @@
     <div class="auth-brand">
       <span class="mark"><span class="dot"></span>CMSC</span>
       <div class="headline">Get it <span class="accent">fabricated</span>.<br>No membership needed.</div>
-      <div class="footnote">Campus Maker Space Co-op &middot; CST8288</div>
+      <div class="footnote">Campus Maker Space Co-op</div>
     </div>
 
     <div class="auth-form-side">
@@ -24,9 +24,19 @@
           <input type="hidden" name="action" value="submitWorkOrder">
           <input type="hidden" name="isExternal" value="true">
 
+          <div class="form-row-split">
+            <div class="field">
+              <label for="firstName">First name</label>
+              <input type="text" id="firstName" name="firstName" required>
+            </div>
+            <div class="field">
+              <label for="lastName">Last name</label>
+              <input type="text" id="lastName" name="lastName" required>
+            </div>
+          </div>
           <div class="field">
-            <label for="contactName">Your name / organization</label>
-            <input type="text" id="contactName" name="contactName" required>
+            <label for="organization">Organization (optional)</label>
+            <input type="text" id="organization" name="organization">
           </div>
           <div class="form-row-split">
             <div class="field">
@@ -42,8 +52,14 @@
             <label for="jobDetails">Describe the job</label>
             <textarea id="jobDetails" name="jobDetails" rows="4" required></textarea>
           </div>
-          <div class="field">
-            <label><input type="checkbox" name="isUrgent" value="true"> This is urgent (rush priority)</label>
+          <div class="form-row-split">
+            <div class="field">
+              <label for="labourRate">Work order rate ($ credits for Shop-Tech)</label>
+              <input type="number" id="labourRate" name="labourRate" step="0.01" min="0" value="0" required>
+            </div>
+            <div class="field field-checkbox">
+              <label class="checkbox-label"><input type="checkbox" name="isUrgent" value="true"> This is urgent (rush priority)</label>
+            </div>
           </div>
 
           <button type="submit" class="btn btn-primary" style="width:100%;">Submit request</button>

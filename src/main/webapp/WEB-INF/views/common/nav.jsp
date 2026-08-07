@@ -20,25 +20,24 @@
          href="${pageContext.request.contextPath}/controller?action=dashboard"><span class="indicator"></span>Dashboard</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link ${activeNav == 'equipmentAvailability' ? 'active' : ''}"
-         href="${pageContext.request.contextPath}/controller?action=viewEquipmentAvailability"><span class="indicator"></span>Book Equipment</a>
+      <a class="nav-link ${activeNav == 'ledger' ? 'active' : ''}"
+         href="${pageContext.request.contextPath}/controller?action=viewLedger"><span class="indicator"></span>My Ledger</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link ${activeNav == 'sessions' ? 'active' : ''}"
-         href="${pageContext.request.contextPath}/controller?action=viewActiveSessions"><span class="indicator"></span>Check In / Out</a>
+      <a class="nav-link ${(activeNav == 'equipmentAvailability' || activeNav == 'sessions') ? 'active' : ''}"
+         href="${pageContext.request.contextPath}/controller?action=viewEquipmentAvailability"><span class="indicator"></span>Book Equipment</a>
     </li>
     <li class="nav-item">
       <a class="nav-link ${activeNav == 'consumables' ? 'active' : ''}"
          href="${pageContext.request.contextPath}/controller?action=viewInventory"><span class="indicator"></span>Consumables</a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link ${activeNav == 'workorders' ? 'active' : ''}"
-         href="${pageContext.request.contextPath}/controller?action=viewWorkOrders"><span class="indicator"></span>Work Orders</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link ${activeNav == 'ledger' ? 'active' : ''}"
-         href="${pageContext.request.contextPath}/controller?action=viewLedger"><span class="indicator"></span>My Ledger</a>
-    </li>
+
+    <c:if test="${sessionScope.currentUser.shopTech}">
+      <li class="nav-item">
+        <a class="nav-link ${activeNav == 'workorders' ? 'active' : ''}"
+           href="${pageContext.request.contextPath}/controller?action=viewWorkOrders"><span class="indicator"></span>Work Orders</a>
+      </li>
+    </c:if>
 
     <c:if test="${sessionScope.currentUser.trainer}">
       <li class="nav-item">
@@ -47,7 +46,7 @@
       </li>
     </c:if>
 
-    <c:if test="${sessionScope.currentUser.shopTech || sessionScope.currentUser.admin}">
+    <c:if test="${sessionScope.currentUser.shopTech}">
       <li class="nav-item">
         <a class="nav-link ${activeNav == 'equipmentManage' ? 'active' : ''}"
            href="${pageContext.request.contextPath}/controller?action=viewEquipment"><span class="indicator"></span>Manage Equipment</a>
@@ -68,6 +67,6 @@
   </ul>
 
   <div class="sidebar-foot">
-    CMSC &middot; CST8288
+    CMSC
   </div>
 </aside>

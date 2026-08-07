@@ -28,13 +28,13 @@ public class DashboardCommand implements Command {
         request.setAttribute("ledgerSummary", summary);
         request.setAttribute("mySessions", sessionBL.getSessionsForUser(user.getUserId()));
 
-        if (user.isShopTech() || user.isAdmin()) {
+        if (user.isShopTech()) {
             request.setAttribute("openAlerts", maintenanceBL.getOpenAlerts());
             request.setAttribute("openWorkOrders", workOrderBL.getOpenWorkOrders());
             request.setAttribute("activeSessions", sessionBL.getActiveSessions());
             request.setAttribute("inventoryReport", consumableBL.getInventoryReport());
         }
-        if (user.isTrainer() || user.isAdmin()) {
+        if (user.isTrainer()) {
             request.setAttribute("mySessionsTaught", trainingBL.getSessionsForTrainer(user.getUserId()));
         }
 
