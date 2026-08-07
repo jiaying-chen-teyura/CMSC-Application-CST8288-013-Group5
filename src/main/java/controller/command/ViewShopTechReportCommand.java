@@ -1,11 +1,11 @@
-package com.algonquin.cmsc.controller.command;
+package controller.command;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.algonquin.cmsc.businesslayer.LedgerBusinessLogic;
-import com.algonquin.cmsc.businesslayer.MaintenanceBusinessLogic;
-import com.algonquin.cmsc.businesslayer.WorkOrderBusinessLogic;
-import com.algonquin.cmsc.controller.SessionUtil;
+import businesslayer.LedgerBusinessLogic;
+import businesslayer.MaintenanceBusinessLogic;
+import businesslayer.WorkOrderBusinessLogic;
+import controller.SessionUtil;
 
 /** FR-06: Shop-Tech report - credits earned by activity (maintenance logged, work orders completed). */
 public class ViewShopTechReportCommand implements Command {

@@ -40,6 +40,9 @@ public class CommandFactory {
         // Consumables & donations (FR-04)
         COMMANDS.put("viewInventory", new ViewInventoryCommand());
         COMMANDS.put("donateConsumable", new DonateConsumableCommand());
+        COMMANDS.put("registerConsumable", new RegisterConsumableCommand());
+        COMMANDS.put("editConsumable", new EditConsumableCommand());
+        COMMANDS.put("deleteConsumable", new DeleteConsumableCommand());
 
         // Work orders
         COMMANDS.put("viewWorkOrders", new ViewWorkOrdersCommand());

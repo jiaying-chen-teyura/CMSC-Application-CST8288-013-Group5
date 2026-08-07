@@ -1,16 +1,23 @@
 package controller.command;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import businesslayer.BookingBusinessLogic;
+import businesslayer.ConsumableBusinessLogic;
+import businesslayer.UsageSessionBusinessLogic;
 import businesslayer.ValidationException;
 import controller.SessionUtil;
+import transferobjects.EquipmentBookingDTO;
+import transferobjects.EquipmentUsageSessionDTO;
 
 /** Book Equipment use case. */
 public class BookEquipmentCommand implements Command {
 
     private final BookingBusinessLogic bookingBL = new BookingBusinessLogic();
+    private final UsageSessionBusinessLogic sessionBL = new UsageSessionBusinessLogic();
+    private final ConsumableBusinessLogic consumableBL = new ConsumableBusinessLogic();
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
@@ -22,8 +29,14 @@ public class BookEquipmentCommand implements Command {
         } catch (ValidationException | java.time.format.DateTimeParseException e) {
             request.setAttribute("errorMessage", e.getMessage());
         }
+        List<EquipmentBookingDTO> myBookings = bookingBL.getBookingsForUser(userId);
+        List<EquipmentUsageSessionDTO> activeSessions = sessionBL.getActiveSessions();
+        sessionBL.attachActiveSessionIds(myBookings, activeSessions);
+
         request.setAttribute("equipmentList", bookingBL.getAvailableEquipment());
-        request.setAttribute("myBookings", bookingBL.getBookingsForUser(userId));
+        request.setAttribute("myBookings", myBookings);
+        request.setAttribute("activeSessions", activeSessions);
+        request.setAttribute("consumables", consumableBL.getAllConsumables());
         return "forward:/WEB-INF/views/booking/booking.jsp";
     }
 }

@@ -48,7 +48,7 @@
           </div>
         </div>
 
-        <c:if test="${sessionScope.currentUser.shopTech || sessionScope.currentUser.admin}">
+        <c:if test="${sessionScope.currentUser.shopTech}">
           <div class="card">
             <h2 class="section-title">Open Maintenance Alerts (FR-05)</h2>
             <c:choose>

@@ -6,7 +6,7 @@ import businesslayer.ConsumableBusinessLogic;
 import businesslayer.EquipmentBusinessLogic;
 import businesslayer.MaintenanceBusinessLogic;
 
-/** FR-06: co-op-wide equipment status list + consumable stock levels, for Shop-Tech/Admin. */
+/** FR-06: co-op-wide equipment status list + consumable stock levels, for Shop-Tech. */
 public class ViewEquipmentInventoryStatusReportCommand implements Command {
 
     private final EquipmentBusinessLogic equipmentBL = new EquipmentBusinessLogic();

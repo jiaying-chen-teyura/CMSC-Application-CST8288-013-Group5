@@ -15,7 +15,7 @@
         Start <span class="accent">making</span>.
       </div>
 
-      <div class="footnote">Campus Maker Space Co-op &middot; CST8288</div>
+      <div class="footnote">Campus Maker Space Co-op</div>
     </div>
 
     <div class="auth-form-side">
@@ -31,9 +31,15 @@
               onsubmit="return document.getElementById('password').value === document.getElementById('confirmPassword').value
                         || (alert('Passwords do not match'), false);">
           <input type="hidden" name="action" value="register">
-          <div class="field">
-            <label for="name">Full name</label>
-            <input type="text" id="name" name="name" placeholder="Jane Student" required>
+          <div class="form-row-split">
+            <div class="field">
+              <label for="firstName">First name</label>
+              <input type="text" id="firstName" name="firstName" placeholder="Jane" required>
+            </div>
+            <div class="field">
+              <label for="lastName">Last name</label>
+              <input type="text" id="lastName" name="lastName" placeholder="Student" required>
+            </div>
           </div>
 
           <div class="field">

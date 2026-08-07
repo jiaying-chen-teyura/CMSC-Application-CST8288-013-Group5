@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import businesslayer.EquipmentBusinessLogic;
 
-/** FR-02: View Equipment (list of all equipment, including inactive, for Shop-Tech/Admin management). */
+/** FR-02: View Equipment (list of all equipment, including inactive, for Shop-Tech management). */
 public class ViewEquipmentCommand implements Command {
 
     private final EquipmentBusinessLogic equipmentBL = new EquipmentBusinessLogic();

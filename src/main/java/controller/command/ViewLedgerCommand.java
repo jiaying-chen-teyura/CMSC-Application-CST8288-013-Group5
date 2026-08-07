@@ -1,9 +1,9 @@
-package com.algonquin.cmsc.controller.command;
+package controller.command;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.algonquin.cmsc.businesslayer.LedgerBusinessLogic;
-import com.algonquin.cmsc.controller.SessionUtil;
+import businesslayer.LedgerBusinessLogic;
+import controller.SessionUtil;
 
 /** FR-06: View Own Ledger Report - debits/credits for the month + amount to settle. */
 public class ViewLedgerCommand implements Command {

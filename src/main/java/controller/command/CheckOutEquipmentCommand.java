@@ -40,6 +40,6 @@ public class CheckOutEquipmentCommand implements Command {
         } catch (ValidationException e) {
             request.setAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/controller?action=viewActiveSessions";
+        return "redirect:/controller?action=viewEquipmentAvailability";
     }
 }

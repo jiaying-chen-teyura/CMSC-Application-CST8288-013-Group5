@@ -18,6 +18,7 @@
 
         <div class="card">
           <h2 class="section-title">Schedule Maintenance</h2>
+          <p class="hint">Pick a date, then an hour, then a minute — minutes are always :00, :15, :30, or :45.</p>
           <form class="form-grid" action="${pageContext.request.contextPath}/controller" method="POST">
             <input type="hidden" name="action" value="scheduleMaintenance">
             <div class="field"><label>Equipment</label>
@@ -40,7 +41,9 @@
                 <option value="HIGH">High</option><option value="URGENT">Urgent</option>
               </select>
             </div>
-            <div class="field"><label>Scheduled Start</label><input type="datetime-local" name="scheduledStart" required></div>
+            <div class="field"><label>Scheduled Start</label>
+              <div class="qh-picker" id="scheduledStartField" data-name="scheduledStart"></div>
+            </div>
             <div class="field" style="grid-column: 1 / -1;"><label>Description</label><input type="text" name="description" required></div>
             <div class="field"><button type="submit" class="btn btn-primary">Schedule</button></div>
           </form>
@@ -80,5 +83,7 @@
       </main>
     </div>
   </div>
+  <script src="${pageContext.request.contextPath}/assets/js/quarter-hour-field.js"></script>
+  <script>initQuarterHourField("scheduledStartField");</script>
 </body>
 </html>
