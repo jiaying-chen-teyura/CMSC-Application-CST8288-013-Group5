@@ -12,11 +12,11 @@ import transferobjects.*;
  * the live "who is using what" report, and the debit side of the credit
  * ledger (equipment access hours + materials consumed).
  *
- * checkOut(...) is also where the Observer pattern fires: every minute of
- * use wears the equipment's components, and if that pushes a component
- * over its maintenance threshold, MaintenanceAlertService notifies all
- * registered listeners (e.g. ShopTechAlertListener) - this is the
- * predictive-maintenance trigger required by FR-05.
+ * checkOut(...) is also where FR-05 gets triggered: every session wears the
+ * equipment's components (MaintenanceBusinessLogic.evaluateWear), and if
+ * that pushes a component over its maintenance threshold the Observer
+ * pattern (MaintenanceAlertService -> ShopTechAlertListener) fires and a
+ * predictive-maintenance alert is opened for the Shop-Techs to schedule.
  * @author Oladimeji Durojaiye
  * @version 1.0
  */
@@ -28,6 +28,7 @@ public class UsageSessionBusinessLogic {
     private final ConsumableDao consumableDao;
     private final MaintenanceDao maintenanceDao;
     private final LedgerDao ledgerDao;
+    private final MaintenanceBusinessLogic maintenanceBL;
 
     public UsageSessionBusinessLogic() {
         this(new EquipmentUsageSessionDaoImpl(), new EquipmentDaoImpl(), new EquipmentBookingDaoImpl(),
@@ -52,6 +53,8 @@ public class UsageSessionBusinessLogic {
         this.consumableDao = consumableDao;
         this.maintenanceDao = maintenanceDao;
         this.ledgerDao = ledgerDao;
+        // Composition, not duplication: predictive-maintenance rules (FR-05) live in one place.
+        this.maintenanceBL = new MaintenanceBusinessLogic(maintenanceDao, equipmentDao, ledgerDao);
     }
 
     /** A single "I used N units of consumable X" line item reported at check-out time. */
@@ -77,8 +80,8 @@ public class UsageSessionBusinessLogic {
         if (equipment == null || !equipment.isActive()) {
             throw new ValidationException("That equipment does not exist or is inactive.");
         }
-        if (equipment.getStatus() == EquipmentDTO.Status.MAINTENANCE) {
-            throw new ValidationException("That equipment is down for maintenance.");
+        if (equipment.getStatus() == EquipmentDTO.Status.MAINTENANCE || equipment.getStatus() == EquipmentDTO.Status.UNAVAILABLE) {
+            throw new ValidationException("That equipment is currently " + equipment.getStatus().name().toLowerCase() + " and cannot be checked into.");
         }
         if (sessionDao.getActiveSessionForEquipment(assetTag) != null) {
             throw new ValidationException("That equipment already has an active session.");
@@ -190,7 +193,9 @@ public class UsageSessionBusinessLogic {
     }
 
     /**
-     * Applies wear to all components of the equipment based on usage hours, and triggers maintenance alerts if thresholds are exceeded.
+     * Applies wear to all components of the equipment based on usage hours, and delegates to
+     * MaintenanceBusinessLogic.evaluateWear (FR-05) to raise alerts / open tasks / flip the
+     * equipment UNAVAILABLE as needed.
      * @param assetTag the asset tag of the equipment
      * @param hours the number of hours the equipment was used
      */
@@ -200,15 +205,7 @@ public class UsageSessionBusinessLogic {
         for (EquipmentComponentDTO c : components) {
             maintenanceDao.addWearHours(c.getComponentId(), hours);
             double newHours = c.getUsageHours() + hours;
-            if (newHours >= c.getMaintenanceThresholdHours()
-                    && c.getComponentStatus() == EquipmentComponentDTO.ComponentStatus.HEALTHY) {
-                maintenanceDao.setComponentStatus(c.getComponentId(), EquipmentComponentDTO.ComponentStatus.MAINTENANCE_REQUIRED);
-
-                // Observer pattern (required pattern): broadcast the predictive-maintenance alert (FR-05).
-                MaintenanceAlertService.getInstance().notifyAlert(new MaintenanceAlertEvent(
-                        assetTag, equipment != null ? equipment.getEquipmentName() : assetTag,
-                        c.getComponentId(), c.getComponentName(), newHours, c.getMaintenanceThresholdHours()));
-            }
+            maintenanceBL.evaluateWear(c, equipment, newHours);
         }
     }
 

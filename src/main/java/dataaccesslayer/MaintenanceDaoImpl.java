@@ -263,23 +263,69 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
     }
 
     /**
-     * Schedules an existing maintenance task by assigning it to a shop technician and setting the scheduled start time.
+     * Retrieves the still-open task (ALERTED, SCHEDULED, or IN_PROGRESS) for a component, if any.
+     * @param componentId the ID of the component
+     * @return the open MaintenanceTaskDTO for that component, or null if none is open
+     */
+    @Override
+    public MaintenanceTaskDTO getOpenTaskForComponent(int componentId) {
+        String sql = TASK_JOIN_SELECT + "WHERE t.component_id = ? "
+                + "AND t.status IN ('ALERTED','SCHEDULED','IN_PROGRESS') LIMIT 1";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, componentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? mapTask(rs) : null;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("getOpenTaskForComponent failed", e);
+        }
+    }
+
+    /**
+     * Schedules an alerted maintenance task by assigning it to a shop technician, setting the
+     * scheduled start time, and letting the Shop-Tech refine its type/priority/description.
+     * Only affects a task that is still ALERTED, so a task can't be double-booked.
      * @param maintenanceId the ID of the task to schedule
      * @param shopTechId the ID of the shop technician to assign
      * @param scheduledStart the scheduled start time to set
+     * @param type the maintenance type to set
+     * @param priority the priority to set
+     * @param description the description to set
      */
     @Override
-    public void scheduleTask(int maintenanceId, int shopTechId, java.time.LocalDateTime scheduledStart) {
-        String sql = "UPDATE maintenance_tasks SET assigned_shop_tech_id=?, scheduled_start=?, status='SCHEDULED' "
-                + "WHERE maintenance_id=?";
+    public void scheduleTask(int maintenanceId, int shopTechId, java.time.LocalDateTime scheduledStart,
+                              MaintenanceTaskDTO.MaintenanceType type, MaintenanceTaskDTO.Priority priority, String description) {
+        String sql = "UPDATE maintenance_tasks SET assigned_shop_tech_id=?, scheduled_start=?, maintenance_type=?, "
+                + "priority=?, description=?, status='SCHEDULED' WHERE maintenance_id=? AND status='ALERTED'";
         try (Connection con = DataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, shopTechId);
             ps.setTimestamp(2, Timestamp.valueOf(scheduledStart));
-            ps.setInt(3, maintenanceId);
+            ps.setString(3, type.name());
+            ps.setString(4, priority.name());
+            ps.setString(5, description);
+            ps.setInt(6, maintenanceId);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("scheduleTask failed", e);
+        }
+    }
+
+    /**
+     * Marks a scheduled maintenance task as started (the Shop-Tech's "check-in" to the job).
+     * @param maintenanceId the ID of the task to start
+     */
+    @Override
+    public void startTask(int maintenanceId) {
+        String sql = "UPDATE maintenance_tasks SET status='IN_PROGRESS', started_at=NOW() "
+                + "WHERE maintenance_id=? AND status='SCHEDULED'";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, maintenanceId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("startTask failed", e);
         }
     }
 

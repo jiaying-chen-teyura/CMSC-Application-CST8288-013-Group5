@@ -53,6 +53,7 @@ public class CommandFactory {
         // Predictive maintenance (FR-05)
         COMMANDS.put("viewMaintenanceAlerts", new ViewMaintenanceAlertsCommand());
         COMMANDS.put("scheduleMaintenance", new ScheduleMaintenanceCommand());
+        COMMANDS.put("startMaintenance", new StartMaintenanceCommand());
         COMMANDS.put("performMaintenance", new PerformMaintenanceCommand());
 
         // Credits & ledger

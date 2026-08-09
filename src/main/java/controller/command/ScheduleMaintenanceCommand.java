@@ -8,7 +8,7 @@ import businesslayer.ValidationException;
 import controller.SessionUtil;
 import transferobjects.MaintenanceTaskDTO;
 
-/** FR-05: Schedule Maintenance (Shop-Tech). */
+/** FR-05: Schedule Maintenance (Shop-Tech claims an ALERTED alert and picks a time). */
 public class ScheduleMaintenanceCommand implements Command {
 
     private final MaintenanceBusinessLogic maintenanceBL = new MaintenanceBusinessLogic();
@@ -16,11 +16,8 @@ public class ScheduleMaintenanceCommand implements Command {
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
         try {
-            String componentIdParam = request.getParameter("componentId");
-            Integer componentId = (componentIdParam == null || componentIdParam.isBlank()) ? null : Integer.valueOf(componentIdParam);
             maintenanceBL.scheduleMaintenance(
-                    request.getParameter("assetTag"),
-                    componentId,
+                    Integer.parseInt(request.getParameter("maintenanceId")),
                     SessionUtil.getCurrentUser(request).getUserId(),
                     MaintenanceTaskDTO.MaintenanceType.valueOf(request.getParameter("maintenanceType")),
                     request.getParameter("description"),

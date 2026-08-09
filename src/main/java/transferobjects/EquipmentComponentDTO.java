@@ -13,6 +13,17 @@ public class EquipmentComponentDTO {
 
     public enum ComponentStatus { HEALTHY, MAINTENANCE_REQUIRED, BROKEN }
 
+    /**
+     * Design decision (documented in the High Level Design per the assignment's
+     * "functional requirements are intentionally left open" note): a component
+     * gets its predictive-maintenance ALERT at {@code maintenanceThresholdHours},
+     * but the equipment does not go UNAVAILABLE the moment that alert fires -
+     * the Shop-Tech has a grace window to schedule and complete the work.
+     * If wear keeps accumulating past 125% of the alert threshold with the
+     * maintenance still not completed, the equipment is forced UNAVAILABLE.
+     */
+    public static final double UNAVAILABLE_THRESHOLD_MULTIPLIER = 1.25;
+
     private Integer componentId;
     private String assetTag;
     private String componentName;
@@ -50,5 +61,10 @@ public class EquipmentComponentDTO {
     /** Returns a value between 0 and 1, where 1 indicates the component has reached its maintenance threshold. */
     public double getWearFraction() {
         return maintenanceThresholdHours <= 0 ? 0 : usageHours / maintenanceThresholdHours;
+    }
+
+    /** The hard "working hours limit" (FR-05): past this, the equipment goes UNAVAILABLE if not yet serviced. */
+    public double getUnavailableThresholdHours() {
+        return maintenanceThresholdHours * UNAVAILABLE_THRESHOLD_MULTIPLIER;
     }
 }
