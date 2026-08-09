@@ -2,6 +2,12 @@ package businesslayer;
 
 import transferobjects.EquipmentDTO;
 
+/**
+ * Utility class for validating equipment data before registration or editing.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
+ */
+
 public class EquipmentValidation {
 
     private EquipmentValidation() { }

@@ -6,6 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import transferobjects.EquipmentDTO;
 
+/**
+ * Data Access Object (DAO) implementation for Equipment entities.
+ * Provides methods for CRUD operations and status updates on equipment.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
+ */
+
 public class EquipmentDaoImpl implements EquipmentDao {
 
     private EquipmentDTO map(ResultSet rs) throws SQLException {
@@ -26,6 +33,11 @@ public class EquipmentDaoImpl implements EquipmentDao {
         return e;
     }
 
+
+    /**
+     * Retrieves all equipment records from the database, ordered by category and equipment name.
+     * @return a list of EquipmentDTO objects representing all equipment
+     */
     @Override
     public List<EquipmentDTO> getAllEquipment() {
         String sql = "SELECT * FROM equipment ORDER BY category, equipment_name";
@@ -40,6 +52,10 @@ public class EquipmentDaoImpl implements EquipmentDao {
         return list;
     }
 
+    /**
+     * Retrieves all active equipment records from the database, ordered by category and equipment name.
+     * @return a list of EquipmentDTO objects representing active equipment
+     */
     @Override
     public List<EquipmentDTO> getActiveEquipment() {
         String sql = "SELECT * FROM equipment WHERE active = TRUE ORDER BY category, equipment_name";
@@ -54,6 +70,11 @@ public class EquipmentDaoImpl implements EquipmentDao {
         return list;
     }
 
+    /**
+     * Retrieves an equipment record by its asset tag.
+     * @param assetTag the unique asset tag of the equipment to retrieve
+     * @return the EquipmentDTO object representing the equipment, or null if not found
+     */
     @Override
     public EquipmentDTO getEquipmentByAssetTag(String assetTag) {
         String sql = "SELECT * FROM equipment WHERE asset_tag = ?";
@@ -68,6 +89,10 @@ public class EquipmentDaoImpl implements EquipmentDao {
         }
     }
 
+    /**
+     * Adds a new equipment record to the database.
+     * @param eq the EquipmentDTO object representing the equipment to add
+     */
     @Override
     public void addEquipment(EquipmentDTO eq) {
         String sql = "INSERT INTO equipment (asset_tag, make, model, category, equipment_name, status, "
@@ -89,6 +114,10 @@ public class EquipmentDaoImpl implements EquipmentDao {
         }
     }
 
+    /**
+     * Updates an existing equipment record in the database.
+     * @param eq the EquipmentDTO object representing the equipment to update
+     */
     @Override
     public void updateEquipment(EquipmentDTO eq) {
         String sql = "UPDATE equipment SET make=?, model=?, category=?, equipment_name=?, status=?, "
@@ -110,6 +139,11 @@ public class EquipmentDaoImpl implements EquipmentDao {
         }
     }
 
+    /**
+     * Updates the status of an equipment record.
+     * @param assetTag the unique asset tag of the equipment to update
+     * @param status the new status for the equipment
+     */
     @Override
     public void updateStatus(String assetTag, EquipmentDTO.Status status) {
         String sql = "UPDATE equipment SET status = ? WHERE asset_tag = ?";
@@ -123,6 +157,10 @@ public class EquipmentDaoImpl implements EquipmentDao {
         }
     }
 
+    /**
+     * Deletes an equipment record from the database.
+     * @param assetTag the unique asset tag of the equipment to delete
+     */
     @Override
     public void deleteEquipment(String assetTag) {
         // Soft delete: FR-02 equipment history (bookings/sessions/maintenance) must survive.
@@ -136,6 +174,11 @@ public class EquipmentDaoImpl implements EquipmentDao {
         }
     }
 
+    /**
+     * Adds usage hours to an equipment record.
+     * @param assetTag the unique asset tag of the equipment to update
+     * @param hours the number of hours to add to the total usage
+     */
     @Override
     public void addUsageHours(String assetTag, double hours) {
         String sql = "UPDATE equipment SET total_usage_hours = total_usage_hours + ? WHERE asset_tag = ?";

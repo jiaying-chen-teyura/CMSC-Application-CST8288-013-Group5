@@ -9,6 +9,8 @@ import transferobjects.EquipmentUsageSessionDTO;
  * DAO for FR-03 (Usage & Session Tracking). getActiveSessions() joins in
  * equipment_name and user name so the "who is using what right now" report
  * required by FR-03 doesn't need N+1 lookups from the business layer.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
  */
 public class EquipmentUsageSessionDaoImpl implements EquipmentUsageSessionDao {
 
@@ -32,6 +34,11 @@ public class EquipmentUsageSessionDaoImpl implements EquipmentUsageSessionDao {
         return s;
     }
 
+    /**
+     * Inserts a new equipment usage session record into the database.
+     * @param session the EquipmentUsageSessionDTO object representing the session to insert
+     * @return the generated usage session ID, or -1 if insertion failed
+     */
     @Override
     public int checkIn(EquipmentUsageSessionDTO session) {
         String sql = "INSERT INTO equipment_usage_sessions (booking_id, user_id, asset_tag, check_in_time, hourly_rate) "
@@ -53,6 +60,11 @@ public class EquipmentUsageSessionDaoImpl implements EquipmentUsageSessionDao {
         }
     }
 
+    /**
+     * Retrieves the active equipment usage session for a given equipment asset tag.
+     * @param assetTag the unique asset tag of the equipment
+     * @return the EquipmentUsageSessionDTO object representing the active session, or null if not found
+     */
     @Override
     public EquipmentUsageSessionDTO getActiveSessionForEquipment(String assetTag) {
         String sql = "SELECT * FROM equipment_usage_sessions WHERE asset_tag = ? AND session_status = 'ACTIVE'";
@@ -67,6 +79,11 @@ public class EquipmentUsageSessionDaoImpl implements EquipmentUsageSessionDao {
         }
     }
 
+    /**
+     * Retrieves an equipment usage session by its ID.
+     * @param usageSessionId the ID of the session to retrieve
+     * @return the EquipmentUsageSessionDTO object representing the session, or null if not found
+     */
     @Override
     public EquipmentUsageSessionDTO getSessionById(int usageSessionId) {
         String sql = "SELECT * FROM equipment_usage_sessions WHERE usage_session_id = ?";
@@ -81,6 +98,13 @@ public class EquipmentUsageSessionDaoImpl implements EquipmentUsageSessionDao {
         }
     }
 
+    /**
+     * Updates an existing equipment usage session record in the database to mark it as checked out.
+     * @param usageSessionId the ID of the session to update
+     * @param checkOutTime the check-out time to set
+     * @param elapsedMinutes the elapsed minutes to set
+     * @param equipmentDebit the equipment debit to set
+     */
     @Override
     public void checkOut(int usageSessionId, java.time.LocalDateTime checkOutTime, int elapsedMinutes, double equipmentDebit) {
         String sql = "UPDATE equipment_usage_sessions SET check_out_time=?, elapsed_minutes=?, equipment_debit=?, "
@@ -97,6 +121,10 @@ public class EquipmentUsageSessionDaoImpl implements EquipmentUsageSessionDao {
         }
     }
 
+    /**
+     * Retrieves a list of all active equipment usage sessions, including equipment names and user names.
+     * @return a list of EquipmentUsageSessionDTO objects representing the active sessions
+     */
     @Override
     public List<EquipmentUsageSessionDTO> getActiveSessions() {
         String sql = "SELECT s.*, e.equipment_name AS equipment_name, u.name AS user_name "
@@ -115,6 +143,11 @@ public class EquipmentUsageSessionDaoImpl implements EquipmentUsageSessionDao {
         return list;
     }
 
+    /**
+     * Retrieves a list of all equipment usage sessions for a specific user, including equipment names and user names.
+     * @param userId the ID of the user whose sessions to retrieve
+     * @return a list of EquipmentUsageSessionDTO objects representing the user's sessions
+     */
     @Override
     public List<EquipmentUsageSessionDTO> getSessionsForUser(int userId) {
         String sql = "SELECT s.*, e.equipment_name AS equipment_name, u.name AS user_name "

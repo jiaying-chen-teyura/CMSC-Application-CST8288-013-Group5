@@ -4,6 +4,13 @@ import java.util.List;
 import transferobjects.EquipmentComponentDTO;
 import transferobjects.MaintenanceTaskDTO;
 
+/**
+ * Data Access Object (DAO) interface for Maintenance entities.
+ * Provides methods for managing equipment components and maintenance tasks, including creation, retrieval, and status updates.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
+ */
+
 public interface MaintenanceDao {
     void addComponent(EquipmentComponentDTO component);
     List<EquipmentComponentDTO> getComponentsForEquipment(String assetTag);

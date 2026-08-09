@@ -12,6 +12,8 @@ import transferobjects.EquipmentDTO;
  * equipment_components rows get seeded automatically for FR-05 predictive
  * maintenance, without RegisterEquipmentCommand needing to know per-category
  * rules itself.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
  */
 public class EquipmentFactory {
 

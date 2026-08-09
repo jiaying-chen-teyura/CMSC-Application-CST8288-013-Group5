@@ -1,5 +1,11 @@
 package businesslayer.observer;
 
+/**
+ * Immutable event payload broadcast to observers when a component crosses its wear threshold.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
+ */
+
 /** Immutable event payload broadcast to observers when a component crosses its wear threshold. */
 public class MaintenanceAlertEvent {
     private final String assetTag;

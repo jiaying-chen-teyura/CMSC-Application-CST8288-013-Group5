@@ -8,6 +8,8 @@ import java.util.List;
  * with, and its default maintenance/component thresholds (FR-05). Produced
  * by EquipmentFactory (Simple Factory pattern) rather than persisted, since
  * it's policy, not data.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
  */
 public abstract class EquipmentProfile {
 

@@ -2,6 +2,13 @@ package transferobjects;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object (DTO) for Equipment entities.
+ * Represents the data structure for equipment, including asset tag, make, model, category, status, access credit rate, total usage hours, location, and registration details.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
+ */
+
 public class EquipmentDTO {
 
     public enum Category { THREE_D_PRINTER, LASER_CUTTER, CNC }
