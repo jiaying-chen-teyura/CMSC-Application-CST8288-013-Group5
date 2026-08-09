@@ -13,7 +13,7 @@
     <div class="app-main">
       <%@ include file="/WEB-INF/views/common/header.jsp" %>
       <main class="content">
-        <div class="content-header"><p>Book a slot, then check equipment in/out and report materials consumed (FR-02/03/04).</p></div>
+        <div class="content-header"><p>Book a slot, then check equipment in/out and report materials consumed .</p></div>
         <%@ include file="/WEB-INF/views/common/alerts.jsp" %>
 
         <div class="card">
@@ -102,7 +102,7 @@
         </div>
 
         <div class="card">
-          <h2 class="section-title">Live Equipment / Session Report (FR-03)</h2>
+          <h2 class="section-title">Live Equipment / Session Report </h2>
           <c:choose>
             <c:when test="${empty activeSessions}"><p class="text-muted">No equipment is currently checked out.</p></c:when>
             <c:otherwise>

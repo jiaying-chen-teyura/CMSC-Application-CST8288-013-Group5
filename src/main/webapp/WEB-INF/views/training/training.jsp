@@ -42,7 +42,7 @@
         </div>
 
         <div class="card">
-          <h2 class="section-title">My Sessions (FR-06 Trainer Report)</h2>
+          <h2 class="section-title">My Sessions </h2>
           <c:choose>
             <c:when test="${empty mySessionsTaught}"><p class="text-muted">No sessions yet.</p></c:when>
             <c:otherwise>
