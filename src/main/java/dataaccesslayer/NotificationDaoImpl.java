@@ -7,59 +7,60 @@ import transferobjects.NotificationDTO;
 
 /**
  * Implements data access operations for user notifications.
- * Persists Observer pattern alerts, including maintenance and low-stock
- * notifications, so they remain available after the HTTP request that
- * generated them has ended.
+ * Persists Observer pattern alerts and supports retrieving, reading,
+ * and archiving notifications.
  *
  * @author Tianzhu Li
  */
 public class NotificationDaoImpl implements NotificationDao {
 
     /**
-     * Maps the current result-set row to a notification transfer object.
+     * Maps the current result-set row to a notification.
      *
      * @param rs the result set containing notification data
      * @return the mapped notification
      * @throws SQLException if the result set cannot be read
      */
     private NotificationDTO map(ResultSet rs) throws SQLException {
-        NotificationDTO n = new NotificationDTO();
+        NotificationDTO notification = new NotificationDTO();
 
-        n.setNotificationId(rs.getInt("notification_id"));
-        n.setUserId(rs.getInt("user_id"));
-        n.setNotificationType(
+        notification.setNotificationId(
+                rs.getInt("notification_id")
+        );
+        notification.setUserId(rs.getInt("user_id"));
+        notification.setNotificationType(
                 NotificationDTO.NotificationType.valueOf(
                         rs.getString("notification_type")
                 )
         );
-        n.setTitle(rs.getString("title"));
-        n.setMessage(rs.getString("message"));
-        n.setCreatedAt(
+        notification.setTitle(rs.getString("title"));
+        notification.setMessage(rs.getString("message"));
+        notification.setCreatedAt(
                 rs.getTimestamp("created_at").toLocalDateTime()
         );
 
         Timestamp read = rs.getTimestamp("read_at");
 
         if (read != null) {
-            n.setReadAt(read.toLocalDateTime());
+            notification.setReadAt(read.toLocalDateTime());
         }
 
-        n.setNotificationStatus(
+        notification.setNotificationStatus(
                 NotificationDTO.NotificationStatus.valueOf(
                         rs.getString("notification_status")
                 )
         );
 
-        return n;
+        return notification;
     }
 
     /**
      * Stores a new notification in the database.
      *
-     * @param n the notification to add
+     * @param notification the notification to add
      */
     @Override
-    public void addNotification(NotificationDTO n) {
+    public void addNotification(NotificationDTO notification) {
         String sql = "INSERT INTO notifications "
                 + "(user_id, notification_type, title, message) "
                 + "VALUES (?,?,?,?)";
@@ -67,10 +68,12 @@ public class NotificationDaoImpl implements NotificationDao {
         try (Connection con = DataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setInt(1, n.getUserId());
-            ps.setString(2, n.getNotificationType().name());
-            ps.setString(3, n.getTitle());
-            ps.setString(4, n.getMessage());
+            ps.setInt(1, notification.getUserId());
+            ps.setString(
+                    2, notification.getNotificationType().name()
+            );
+            ps.setString(3, notification.getTitle());
+            ps.setString(4, notification.getMessage());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("addNotification failed", e);
@@ -78,8 +81,7 @@ public class NotificationDaoImpl implements NotificationDao {
     }
 
     /**
-     * Retrieves all unread notifications for a user in reverse
-     * chronological order.
+     * Retrieves all unread notifications for a user.
      *
      * @param userId the ID of the user
      * @return a list of the user's unread notifications
@@ -104,20 +106,20 @@ public class NotificationDaoImpl implements NotificationDao {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("getUnreadForUser failed", e);
+            throw new RuntimeException(
+                    "getUnreadForUser failed", e
+            );
         }
 
         return list;
     }
 
     /**
-     * Retrieves recent notifications for users with a specified user type.
-     * Results are returned in reverse chronological order and restricted
-     * to the supplied maximum number.
+     * Retrieves recent notifications for users of a specified type.
      *
      * @param userType the type of users whose notifications are requested
      * @param limit the maximum number of notifications to return
-     * @return a list of recent notifications for the specified user type
+     * @return a list of recent notifications
      */
     @Override
     public List<NotificationDTO> getRecentForUsersOfType(
@@ -148,5 +150,65 @@ public class NotificationDaoImpl implements NotificationDao {
         }
 
         return list;
+    }
+
+    /**
+     * Marks a user's notification as read and records the read time.
+     *
+     * @param notificationId the ID of the notification
+     * @param userId the ID of the notification owner
+     * @return true if the notification was updated; otherwise false
+     */
+    @Override
+    public boolean markAsRead(int notificationId, int userId) {
+        String sql = "UPDATE notifications "
+                + "SET notification_status='READ', "
+                + "read_at=COALESCE(read_at, NOW()) "
+                + "WHERE notification_id=? AND user_id=? "
+                + "AND notification_status='UNREAD'";
+
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, notificationId);
+            ps.setInt(2, userId);
+
+            return ps.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new RuntimeException("markAsRead failed", e);
+        }
+    }
+
+    /**
+     * Archives a user's notification.
+     * If the notification has not previously been read, its read time is
+     * also recorded.
+     *
+     * @param notificationId the ID of the notification
+     * @param userId the ID of the notification owner
+     * @return true if the notification was updated; otherwise false
+     */
+    @Override
+    public boolean archiveNotification(
+            int notificationId, int userId) {
+
+        String sql = "UPDATE notifications "
+                + "SET notification_status='ARCHIVED', "
+                + "read_at=COALESCE(read_at, NOW()) "
+                + "WHERE notification_id=? AND user_id=? "
+                + "AND notification_status<>'ARCHIVED'";
+
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, notificationId);
+            ps.setInt(2, userId);
+
+            return ps.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "archiveNotification failed", e
+            );
+        }
     }
 }
