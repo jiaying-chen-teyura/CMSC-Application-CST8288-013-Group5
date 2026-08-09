@@ -3,6 +3,13 @@ package dataaccesslayer;
 import java.util.List;
 import transferobjects.EquipmentDTO;
 
+/**
+ * Data Access Object (DAO) interface for Equipment entities.
+ * Provides methods for CRUD operations and status updates on equipment.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
+ */
+
 public interface EquipmentDao {
     List<EquipmentDTO> getAllEquipment();
     List<EquipmentDTO> getActiveEquipment();

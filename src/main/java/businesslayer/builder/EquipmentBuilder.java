@@ -11,6 +11,8 @@ import transferobjects.EquipmentDTO;
  * from calling a long telescoping constructor or a pile of setters.
  *
  * Used by: EquipmentBusinessLogic.registerEquipment(...)
+ * @author Oladimeji Durojaiye
+ * @version 1.0
  */
 public class EquipmentBuilder {
 
@@ -61,6 +63,11 @@ public class EquipmentBuilder {
         return this;
     }
 
+    /**
+     * Validates the required fields and returns the built EquipmentDTO.
+     * @return the built EquipmentDTO
+     * @throws IllegalStateException if any required field is missing
+     */
     public EquipmentDTO build() {
         if (equipment.getAssetTag() == null || equipment.getAssetTag().isBlank()) {
             throw new IllegalStateException("EquipmentBuilder: assetTag is required");

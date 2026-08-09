@@ -6,6 +6,13 @@ import java.util.List;
 import transferobjects.EquipmentComponentDTO;
 import transferobjects.MaintenanceTaskDTO;
 
+/**
+ * Data Access Object (DAO) interface for Maintenance entities.
+ * Provides methods for managing equipment components and maintenance tasks, including creation, retrieval, and status updates.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
+ */
+
 /** DAO backing FR-05 (predictive maintenance alerts). */
 public class MaintenanceDaoImpl implements MaintenanceDao {
 
@@ -48,6 +55,10 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
         return m;
     }
 
+    /**
+     * Inserts a new equipment component record into the database.
+     * @param component the EquipmentComponentDTO object representing the component to insert
+     */
     @Override
     public void addComponent(EquipmentComponentDTO component) {
         String sql = "INSERT INTO equipment_components (asset_tag, component_name, maintenance_threshold_hours) "
@@ -63,6 +74,11 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
         }
     }
 
+    /**
+     * Retrieves a list of all equipment components for a specific equipment asset tag.
+     * @param assetTag the unique asset tag of the equipment
+     * @return a list of EquipmentComponentDTO objects representing the components
+     */
     @Override
     public List<EquipmentComponentDTO> getComponentsForEquipment(String assetTag) {
         String sql = "SELECT * FROM equipment_components WHERE asset_tag = ?";
@@ -79,6 +95,11 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
         return list;
     }
 
+    /**
+     * Retrieves an equipment component by its ID.
+     * @param componentId the ID of the component to retrieve
+     * @return the EquipmentComponentDTO object representing the component, or null if not found
+     */
     @Override
     public EquipmentComponentDTO getComponentById(int componentId) {
         String sql = "SELECT * FROM equipment_components WHERE component_id = ?";
@@ -93,6 +114,11 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
         }
     }
 
+    /**
+     * Adds wear hours to an existing equipment component record in the database.
+     * @param componentId the ID of the component to update
+     * @param hours the number of wear hours to add
+     */
     @Override
     public void addWearHours(int componentId, double hours) {
         String sql = "UPDATE equipment_components SET usage_hours = usage_hours + ? WHERE component_id = ?";
@@ -106,6 +132,11 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
         }
     }
 
+    /**
+     * Updates the status of an existing equipment component record in the database.
+     * @param componentId the ID of the component to update
+     * @param status the new status to set
+     */
     @Override
     public void setComponentStatus(int componentId, EquipmentComponentDTO.ComponentStatus status) {
         String sql = "UPDATE equipment_components SET component_status = ? WHERE component_id = ?";
@@ -119,6 +150,10 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
         }
     }
 
+    /**
+     * Resets an existing equipment component record in the database after maintenance, setting usage hours to zero and status to healthy.
+     * @param componentId the ID of the component to reset
+     */
     @Override
     public void resetComponentAfterMaintenance(int componentId) {
         String sql = "UPDATE equipment_components SET usage_hours = 0, component_status = 'HEALTHY', "
@@ -132,6 +167,11 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
         }
     }
 
+    /**
+     * Creates a new maintenance task record in the database.
+     * @param task the MaintenanceTaskDTO object representing the task to create
+     * @return the generated ID of the new maintenance task, or -1 if creation failed
+     */
     @Override
     public int createMaintenanceTask(MaintenanceTaskDTO task) {
         String sql = "INSERT INTO maintenance_tasks (asset_tag, component_id, assigned_shop_tech_id, maintenance_type, "
@@ -163,6 +203,10 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
             + "JOIN equipment e ON e.asset_tag = t.asset_tag "
             + "LEFT JOIN equipment_components c ON c.component_id = t.component_id ";
 
+    /**
+     * Retrieves a list of all open maintenance tasks, including equipment names and component names.
+     * @return a list of MaintenanceTaskDTO objects representing the open tasks
+     */
     @Override
     public List<MaintenanceTaskDTO> getOpenMaintenanceTasks() {
         String sql = TASK_JOIN_SELECT + "WHERE t.status IN ('ALERTED','SCHEDULED','IN_PROGRESS') "
@@ -178,6 +222,11 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
         return list;
     }
 
+    /**
+     * Retrieves a list of all maintenance tasks assigned to a specific shop technician, including equipment names and component names.
+     * @param shopTechId the ID of the shop technician whose tasks to retrieve
+     * @return a list of MaintenanceTaskDTO objects representing the technician's tasks
+     */
     @Override
     public List<MaintenanceTaskDTO> getTasksForShopTech(int shopTechId) {
         String sql = TASK_JOIN_SELECT + "WHERE t.assigned_shop_tech_id = ? ORDER BY t.scheduled_start";
@@ -194,6 +243,11 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
         return list;
     }
 
+    /**
+     * Retrieves a maintenance task by its ID, including equipment name and component name.
+     * @param maintenanceId the ID of the task to retrieve
+     * @return the MaintenanceTaskDTO object representing the task, or null if not found
+     */
     @Override
     public MaintenanceTaskDTO getTaskById(int maintenanceId) {
         String sql = TASK_JOIN_SELECT + "WHERE t.maintenance_id = ?";
@@ -208,6 +262,12 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
         }
     }
 
+    /**
+     * Schedules an existing maintenance task by assigning it to a shop technician and setting the scheduled start time.
+     * @param maintenanceId the ID of the task to schedule
+     * @param shopTechId the ID of the shop technician to assign
+     * @param scheduledStart the scheduled start time to set
+     */
     @Override
     public void scheduleTask(int maintenanceId, int shopTechId, java.time.LocalDateTime scheduledStart) {
         String sql = "UPDATE maintenance_tasks SET assigned_shop_tech_id=?, scheduled_start=?, status='SCHEDULED' "
@@ -223,6 +283,12 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
         }
     }
 
+    /**
+     * Updates an existing maintenance task record in the database to mark it as completed, setting maintenance hours and credit earned.
+     * @param maintenanceId the ID of the task to update
+     * @param maintenanceHours the maintenance hours to set
+     * @param creditEarned the credit earned to set
+     */
     @Override
     public void completeTask(int maintenanceId, double maintenanceHours, double creditEarned) {
         String sql = "UPDATE maintenance_tasks SET status='COMPLETED', started_at=COALESCE(started_at, NOW()), "

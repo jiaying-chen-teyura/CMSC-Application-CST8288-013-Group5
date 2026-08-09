@@ -2,6 +2,13 @@ package transferobjects;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object (DTO) for Equipment Usage Session entities.
+ * Represents the data structure for equipment usage sessions, including session ID, booking ID, user ID, asset tag, check-in and check-out times, elapsed minutes, hourly rate, equipment debit, session status, and convenience fields for equipment and user names.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
+ */
+
 public class EquipmentUsageSessionDTO {
 
     public enum SessionStatus { ACTIVE, COMPLETED, INTERRUPTED }

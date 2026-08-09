@@ -11,6 +11,8 @@ import java.util.List;
  * independently without MaintenanceBusinessLogic knowing who's listening.
  * A single static instance is used app-wide so listeners registered once
  * (e.g. at servlet init) stay attached for the life of the application.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
  */
 public class MaintenanceAlertService {
 

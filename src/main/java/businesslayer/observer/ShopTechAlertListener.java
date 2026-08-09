@@ -12,6 +12,8 @@ import transferobjects.UserDTO;
  * Concrete Observer: when a component crosses its wear threshold, push a
  * MAINTENANCE notification to every Shop-Tech so they see it under
  * "View Maintenance Alerts" (FR-05) without polling.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
  */
 public class ShopTechAlertListener implements MaintenanceListener {
 

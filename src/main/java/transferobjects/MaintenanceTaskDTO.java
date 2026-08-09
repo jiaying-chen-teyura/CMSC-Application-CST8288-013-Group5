@@ -2,6 +2,13 @@ package transferobjects;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object (DTO) for Maintenance Task entities.
+ * Represents the data structure for maintenance tasks, including maintenance ID, asset tag, component ID, assigned shop technician ID, maintenance type, description, priority, scheduled start time, actual start and completion times, maintenance hours, status, credit earned, and convenience fields for equipment and component names.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
+ */
+
 public class MaintenanceTaskDTO {
 
     public enum MaintenanceType { PREVENTIVE, REPAIR, INSPECTION }

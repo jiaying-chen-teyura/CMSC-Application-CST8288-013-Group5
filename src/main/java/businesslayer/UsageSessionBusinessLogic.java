@@ -17,6 +17,8 @@ import transferobjects.*;
  * over its maintenance threshold, MaintenanceAlertService notifies all
  * registered listeners (e.g. ShopTechAlertListener) - this is the
  * predictive-maintenance trigger required by FR-05.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
  */
 public class UsageSessionBusinessLogic {
 
@@ -32,6 +34,15 @@ public class UsageSessionBusinessLogic {
              new ConsumableDaoImpl(), new MaintenanceDaoImpl(), new LedgerDaoImpl());
     }
 
+    /**
+     * Constructor for dependency injection, primarily for unit testing.
+     * @param sessionDao the EquipmentUsageSessionDao to use
+     * @param equipmentDao the EquipmentDao to use
+     * @param bookingDao the EquipmentBookingDao to use
+     * @param consumableDao the ConsumableDao to use
+     * @param maintenanceDao the MaintenanceDao to use
+     * @param ledgerDao the LedgerDao to use
+     */
     public UsageSessionBusinessLogic(EquipmentUsageSessionDao sessionDao, EquipmentDao equipmentDao,
                                       EquipmentBookingDao bookingDao, ConsumableDao consumableDao,
                                       MaintenanceDao maintenanceDao, LedgerDao ledgerDao) {
@@ -53,6 +64,14 @@ public class UsageSessionBusinessLogic {
         }
     }
 
+    /**
+     * Checks in a user to an equipment usage session, creating a new session record.
+     * @param userId the ID of the user checking in
+     * @param assetTag the asset tag of the equipment being checked into
+     * @param bookingId the ID of the associated booking, if any (can be null)
+     * @return the newly created EquipmentUsageSessionDTO
+     * @throws ValidationException if validation fails (e.g., equipment doesn't exist, is inactive, or already has an active session)
+     */
     public EquipmentUsageSessionDTO checkIn(int userId, String assetTag, Integer bookingId) throws ValidationException {
         EquipmentDTO equipment = equipmentDao.getEquipmentByAssetTag(assetTag);
         if (equipment == null || !equipment.isActive()) {
@@ -82,6 +101,13 @@ public class UsageSessionBusinessLogic {
         return session;
     }
 
+    /**
+     * Checks out a user from an equipment usage session, finalizing the session record and applying any material usage.
+     * @param usageSessionId the ID of the usage session to check out from
+     * @param requestingUserId the ID of the user requesting the check-out (must match the session's user)
+     * @param materialsUsed a list of MaterialUsageRequest representing any consumables used during the session
+     * @throws ValidationException if validation fails (e.g., session not found, already closed, or user mismatch)
+     */
     public void checkOut(int usageSessionId, int requestingUserId, List<MaterialUsageRequest> materialsUsed)
             throws ValidationException {
         EquipmentUsageSessionDTO session = sessionDao.getSessionById(usageSessionId);
@@ -119,6 +145,12 @@ public class UsageSessionBusinessLogic {
         wearComponentsForSession(session.getAssetTag(), hours);
     }
 
+    /**
+     * Applies a material usage request to a session, adjusting stock and recording the debit.
+     * @param session the EquipmentUsageSessionDTO representing the active session
+     * @param req the MaterialUsageRequest representing the consumable usage
+     * @throws ValidationException if validation fails (e.g., unknown consumable, insufficient stock)
+     */
     private void applyMaterialUsage(EquipmentUsageSessionDTO session, MaterialUsageRequest req) throws ValidationException {
         ConsumableDTO consumable = consumableDao.getConsumableById(req.consumableId);
         if (consumable == null) throw new ValidationException("Unknown consumable.");
@@ -157,6 +189,11 @@ public class UsageSessionBusinessLogic {
         }
     }
 
+    /**
+     * Applies wear to all components of the equipment based on usage hours, and triggers maintenance alerts if thresholds are exceeded.
+     * @param assetTag the asset tag of the equipment
+     * @param hours the number of hours the equipment was used
+     */
     private void wearComponentsForSession(String assetTag, double hours) {
         List<EquipmentComponentDTO> components = maintenanceDao.getComponentsForEquipment(assetTag);
         EquipmentDTO equipment = equipmentDao.getEquipmentByAssetTag(assetTag);
@@ -175,6 +212,13 @@ public class UsageSessionBusinessLogic {
         }
     }
 
+    /**
+     * Records a debit transaction in the ledger for a user.
+     * @param userId the ID of the user
+     * @param activityType the type of activity (equipment usage or material usage)
+     * @param amount the amount to debit
+     * @param description a description of the transaction
+     */
     private void recordDebit(int userId, AccountTransactionDTO.ActivityType activityType, double amount, String description) {
         if (amount <= 0) return;
         AccountTransactionDTO tx = new AccountTransactionDTO();
@@ -186,6 +230,10 @@ public class UsageSessionBusinessLogic {
         ledgerDao.recordTransaction(tx);
     }
 
+    /**
+     * Retrieves all active equipment usage sessions.
+     * @return a list of EquipmentUsageSessionDTOs representing all active sessions
+     */
     public List<EquipmentUsageSessionDTO> getActiveSessions() {
         return sessionDao.getActiveSessions();
     }
@@ -208,9 +256,19 @@ public class UsageSessionBusinessLogic {
         }
     }
 
+    /**
+     * Retrieves all usage sessions for a specific user.
+     * @param userId the ID of the user
+     * @return a list of EquipmentUsageSessionDTOs representing the user's sessions
+     */
     public List<EquipmentUsageSessionDTO> getSessionsForUser(int userId) {
         return sessionDao.getSessionsForUser(userId);
     }
 
+    /**
+     * Rounds a double value to two decimal places.
+     * @param v the value to round
+     * @return the rounded value
+     */
     private double round2(double v) { return Math.round(v * 100.0) / 100.0; }
 }
