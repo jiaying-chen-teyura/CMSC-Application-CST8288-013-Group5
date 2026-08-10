@@ -1,0 +1,352 @@
+package dataaccesslayer;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import transferobjects.EquipmentComponentDTO;
+import transferobjects.MaintenanceTaskDTO;
+
+/**
+ * Data Access Object (DAO) interface for Maintenance entities.
+ * Provides methods for managing equipment components and maintenance tasks, including creation, retrieval, and status updates.
+ * @author Oladimeji Durojaiye
+ * @version 1.0
+ */
+
+/** DAO backing FR-05 (predictive maintenance alerts). */
+public class MaintenanceDaoImpl implements MaintenanceDao {
+
+    private EquipmentComponentDTO mapComponent(ResultSet rs) throws SQLException {
+        EquipmentComponentDTO c = new EquipmentComponentDTO();
+        c.setComponentId(rs.getInt("component_id"));
+        c.setAssetTag(rs.getString("asset_tag"));
+        c.setComponentName(rs.getString("component_name"));
+        c.setUsageHours(rs.getDouble("usage_hours"));
+        c.setMaintenanceThresholdHours(rs.getDouble("maintenance_threshold_hours"));
+        c.setComponentStatus(EquipmentComponentDTO.ComponentStatus.valueOf(rs.getString("component_status")));
+        Timestamp t = rs.getTimestamp("last_maintained_at");
+        if (t != null) c.setLastMaintainedAt(t.toLocalDateTime());
+        return c;
+    }
+
+    private MaintenanceTaskDTO mapTask(ResultSet rs) throws SQLException {
+        MaintenanceTaskDTO m = new MaintenanceTaskDTO();
+        m.setMaintenanceId(rs.getInt("maintenance_id"));
+        m.setAssetTag(rs.getString("asset_tag"));
+        int compId = rs.getInt("component_id");
+        if (!rs.wasNull()) m.setComponentId(compId);
+        int techId = rs.getInt("assigned_shop_tech_id");
+        if (!rs.wasNull()) m.setAssignedShopTechId(techId);
+        m.setMaintenanceType(MaintenanceTaskDTO.MaintenanceType.valueOf(rs.getString("maintenance_type")));
+        m.setDescription(rs.getString("description"));
+        m.setPriority(MaintenanceTaskDTO.Priority.valueOf(rs.getString("priority")));
+        Timestamp sched = rs.getTimestamp("scheduled_start");
+        if (sched != null) m.setScheduledStart(sched.toLocalDateTime());
+        Timestamp started = rs.getTimestamp("started_at");
+        if (started != null) m.setStartedAt(started.toLocalDateTime());
+        Timestamp completed = rs.getTimestamp("completed_at");
+        if (completed != null) m.setCompletedAt(completed.toLocalDateTime());
+        double hrs = rs.getDouble("maintenance_hours");
+        if (!rs.wasNull()) m.setMaintenanceHours(hrs);
+        m.setStatus(MaintenanceTaskDTO.Status.valueOf(rs.getString("status")));
+        m.setCreditEarned(rs.getDouble("credit_earned"));
+        try { m.setEquipmentName(rs.getString("equipment_name")); } catch (SQLException ignored) { }
+        try { m.setComponentName(rs.getString("component_name_join")); } catch (SQLException ignored) { }
+        return m;
+    }
+
+    /**
+     * Inserts a new equipment component record into the database.
+     * @param component the EquipmentComponentDTO object representing the component to insert
+     */
+    @Override
+    public void addComponent(EquipmentComponentDTO component) {
+        String sql = "INSERT INTO equipment_components (asset_tag, component_name, maintenance_threshold_hours) "
+                + "VALUES (?,?,?)";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, component.getAssetTag());
+            ps.setString(2, component.getComponentName());
+            ps.setDouble(3, component.getMaintenanceThresholdHours());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("addComponent failed", e);
+        }
+    }
+
+    /**
+     * Retrieves a list of all equipment components for a specific equipment asset tag.
+     * @param assetTag the unique asset tag of the equipment
+     * @return a list of EquipmentComponentDTO objects representing the components
+     */
+    @Override
+    public List<EquipmentComponentDTO> getComponentsForEquipment(String assetTag) {
+        String sql = "SELECT * FROM equipment_components WHERE asset_tag = ?";
+        List<EquipmentComponentDTO> list = new ArrayList<>();
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, assetTag);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapComponent(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("getComponentsForEquipment failed", e);
+        }
+        return list;
+    }
+
+    /**
+     * Retrieves an equipment component by its ID.
+     * @param componentId the ID of the component to retrieve
+     * @return the EquipmentComponentDTO object representing the component, or null if not found
+     */
+    @Override
+    public EquipmentComponentDTO getComponentById(int componentId) {
+        String sql = "SELECT * FROM equipment_components WHERE component_id = ?";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, componentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? mapComponent(rs) : null;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("getComponentById failed", e);
+        }
+    }
+
+    /**
+     * Adds wear hours to an existing equipment component record in the database.
+     * @param componentId the ID of the component to update
+     * @param hours the number of wear hours to add
+     */
+    @Override
+    public void addWearHours(int componentId, double hours) {
+        String sql = "UPDATE equipment_components SET usage_hours = usage_hours + ? WHERE component_id = ?";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setDouble(1, hours);
+            ps.setInt(2, componentId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("addWearHours failed", e);
+        }
+    }
+
+    /**
+     * Updates the status of an existing equipment component record in the database.
+     * @param componentId the ID of the component to update
+     * @param status the new status to set
+     */
+    @Override
+    public void setComponentStatus(int componentId, EquipmentComponentDTO.ComponentStatus status) {
+        String sql = "UPDATE equipment_components SET component_status = ? WHERE component_id = ?";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, status.name());
+            ps.setInt(2, componentId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("setComponentStatus failed", e);
+        }
+    }
+
+    /**
+     * Resets an existing equipment component record in the database after maintenance, setting usage hours to zero and status to healthy.
+     * @param componentId the ID of the component to reset
+     */
+    @Override
+    public void resetComponentAfterMaintenance(int componentId) {
+        String sql = "UPDATE equipment_components SET usage_hours = 0, component_status = 'HEALTHY', "
+                + "last_maintained_at = NOW() WHERE component_id = ?";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, componentId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("resetComponentAfterMaintenance failed", e);
+        }
+    }
+
+    /**
+     * Creates a new maintenance task record in the database.
+     * @param task the MaintenanceTaskDTO object representing the task to create
+     * @return the generated ID of the new maintenance task, or -1 if creation failed
+     */
+    @Override
+    public int createMaintenanceTask(MaintenanceTaskDTO task) {
+        String sql = "INSERT INTO maintenance_tasks (asset_tag, component_id, assigned_shop_tech_id, maintenance_type, "
+                + "description, priority, scheduled_start, status) VALUES (?,?,?,?,?,?,?,?)";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, task.getAssetTag());
+            if (task.getComponentId() != null) ps.setInt(2, task.getComponentId()); else ps.setNull(2, Types.INTEGER);
+            if (task.getAssignedShopTechId() != null) ps.setInt(3, task.getAssignedShopTechId()); else ps.setNull(3, Types.INTEGER);
+            ps.setString(4, task.getMaintenanceType().name());
+            ps.setString(5, task.getDescription());
+            ps.setString(6, task.getPriority().name());
+            if (task.getScheduledStart() != null) ps.setTimestamp(7, Timestamp.valueOf(task.getScheduledStart()));
+            else ps.setNull(7, Types.TIMESTAMP);
+            ps.setString(8, task.getStatus().name());
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) return keys.getInt(1);
+            }
+            return -1;
+        } catch (SQLException e) {
+            throw new RuntimeException("createMaintenanceTask failed", e);
+        }
+    }
+
+    private static final String TASK_JOIN_SELECT =
+            "SELECT t.*, e.equipment_name AS equipment_name, c.component_name AS component_name_join "
+            + "FROM maintenance_tasks t "
+            + "JOIN equipment e ON e.asset_tag = t.asset_tag "
+            + "LEFT JOIN equipment_components c ON c.component_id = t.component_id ";
+
+    /**
+     * Retrieves a list of all open maintenance tasks, including equipment names and component names.
+     * @return a list of MaintenanceTaskDTO objects representing the open tasks
+     */
+    @Override
+    public List<MaintenanceTaskDTO> getOpenMaintenanceTasks() {
+        String sql = TASK_JOIN_SELECT + "WHERE t.status IN ('ALERTED','SCHEDULED','IN_PROGRESS') "
+                + "ORDER BY FIELD(t.priority,'URGENT','HIGH','MEDIUM','LOW'), t.scheduled_start";
+        List<MaintenanceTaskDTO> list = new ArrayList<>();
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) list.add(mapTask(rs));
+        } catch (SQLException e) {
+            throw new RuntimeException("getOpenMaintenanceTasks failed", e);
+        }
+        return list;
+    }
+
+    /**
+     * Retrieves a list of all maintenance tasks assigned to a specific shop technician, including equipment names and component names.
+     * @param shopTechId the ID of the shop technician whose tasks to retrieve
+     * @return a list of MaintenanceTaskDTO objects representing the technician's tasks
+     */
+    @Override
+    public List<MaintenanceTaskDTO> getTasksForShopTech(int shopTechId) {
+        String sql = TASK_JOIN_SELECT + "WHERE t.assigned_shop_tech_id = ? ORDER BY t.scheduled_start";
+        List<MaintenanceTaskDTO> list = new ArrayList<>();
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, shopTechId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapTask(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("getTasksForShopTech failed", e);
+        }
+        return list;
+    }
+
+    /**
+     * Retrieves a maintenance task by its ID, including equipment name and component name.
+     * @param maintenanceId the ID of the task to retrieve
+     * @return the MaintenanceTaskDTO object representing the task, or null if not found
+     */
+    @Override
+    public MaintenanceTaskDTO getTaskById(int maintenanceId) {
+        String sql = TASK_JOIN_SELECT + "WHERE t.maintenance_id = ?";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, maintenanceId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? mapTask(rs) : null;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("getTaskById failed", e);
+        }
+    }
+
+    /**
+     * Retrieves the still-open task (ALERTED, SCHEDULED, or IN_PROGRESS) for a component, if any.
+     * @param componentId the ID of the component
+     * @return the open MaintenanceTaskDTO for that component, or null if none is open
+     */
+    @Override
+    public MaintenanceTaskDTO getOpenTaskForComponent(int componentId) {
+        String sql = TASK_JOIN_SELECT + "WHERE t.component_id = ? "
+                + "AND t.status IN ('ALERTED','SCHEDULED','IN_PROGRESS') LIMIT 1";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, componentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? mapTask(rs) : null;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("getOpenTaskForComponent failed", e);
+        }
+    }
+
+    /**
+     * Schedules an alerted maintenance task by assigning it to a shop technician, setting the
+     * scheduled start time, and letting the Shop-Tech refine its type/priority/description.
+     * Only affects a task that is still ALERTED, so a task can't be double-booked.
+     * @param maintenanceId the ID of the task to schedule
+     * @param shopTechId the ID of the shop technician to assign
+     * @param scheduledStart the scheduled start time to set
+     * @param type the maintenance type to set
+     * @param priority the priority to set
+     * @param description the description to set
+     */
+    @Override
+    public void scheduleTask(int maintenanceId, int shopTechId, java.time.LocalDateTime scheduledStart,
+                              MaintenanceTaskDTO.MaintenanceType type, MaintenanceTaskDTO.Priority priority, String description) {
+        String sql = "UPDATE maintenance_tasks SET assigned_shop_tech_id=?, scheduled_start=?, maintenance_type=?, "
+                + "priority=?, description=?, status='SCHEDULED' WHERE maintenance_id=? AND status='ALERTED'";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, shopTechId);
+            ps.setTimestamp(2, Timestamp.valueOf(scheduledStart));
+            ps.setString(3, type.name());
+            ps.setString(4, priority.name());
+            ps.setString(5, description);
+            ps.setInt(6, maintenanceId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("scheduleTask failed", e);
+        }
+    }
+
+    /**
+     * Marks a scheduled maintenance task as started (the Shop-Tech's "check-in" to the job).
+     * @param maintenanceId the ID of the task to start
+     */
+    @Override
+    public void startTask(int maintenanceId) {
+        String sql = "UPDATE maintenance_tasks SET status='IN_PROGRESS', started_at=NOW() "
+                + "WHERE maintenance_id=? AND status='SCHEDULED'";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, maintenanceId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("startTask failed", e);
+        }
+    }
+
+    /**
+     * Updates an existing maintenance task record in the database to mark it as completed, setting maintenance hours and credit earned.
+     * @param maintenanceId the ID of the task to update
+     * @param maintenanceHours the maintenance hours to set
+     * @param creditEarned the credit earned to set
+     */
+    @Override
+    public void completeTask(int maintenanceId, double maintenanceHours, double creditEarned) {
+        String sql = "UPDATE maintenance_tasks SET status='COMPLETED', started_at=COALESCE(started_at, NOW()), "
+                + "completed_at=NOW(), maintenance_hours=?, credit_earned=? WHERE maintenance_id=?";
+        try (Connection con = DataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setDouble(1, maintenanceHours);
+            ps.setDouble(2, creditEarned);
+            ps.setInt(3, maintenanceId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("completeTask failed", e);
+        }
+    }
+}
