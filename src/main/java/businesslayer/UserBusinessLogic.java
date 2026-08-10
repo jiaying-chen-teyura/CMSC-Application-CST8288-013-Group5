@@ -11,6 +11,8 @@ import transferobjects.UserDTO;
  *
  * This class validates user input before sending user information
  * to the Data Access Layer.
+ *
+ * @author Tianzhu Li
  */
 public class UserBusinessLogic {
 

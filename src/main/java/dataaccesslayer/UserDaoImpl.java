@@ -16,6 +16,7 @@ import transferobjects.UserDTO;
  *
  * This class performs user-related database operations and converts
  * database records into UserDTO objects.
+ * @author Tianzhu Li
  */
 public class UserDaoImpl implements UserDao {
 

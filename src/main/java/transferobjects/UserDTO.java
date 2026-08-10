@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
  *
  * This class stores user account information, including authentication
  * details, account type, account status, and login timestamps.
+ *
+ * @author Tianzhu Li
  */
 public class UserDTO {
 

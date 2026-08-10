@@ -3,6 +3,8 @@ package businesslayer;
 /**
  * Represents an error caused by invalid business-layer input
  * or an invalid business operation.
+ *
+ * @author Tianzhu Li
  */
 public class ValidationException extends Exception {
 

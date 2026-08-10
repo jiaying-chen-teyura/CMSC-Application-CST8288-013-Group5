@@ -9,6 +9,7 @@ import transferobjects.UserDTO;
  * The implementation of this interface is responsible for performing
  * CRUD and user-related database operations without exposing SQL to the
  * Business Layer.
+ * @author Tianzhu Li
  */
 public interface UserDao {
 
